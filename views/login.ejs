@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <%- include('partials/flash-messages') %>
     <div class="login-container">
         <form class="login-form" action="/login" method="POST">
             <h2>Welcome to Gyan Ganga  Gyan Ganga 📖</h2>
@@ -34,7 +35,7 @@
             <button type="submit">Login</button>
             
             <div class="register-link">
-                <p>Don't have an account? <a href="./register.html">Register Here</a></p>
+                <p>Don't have an account? <a href="/signup">Register Here</a></p>
             </div>
         </form>
     </div>
