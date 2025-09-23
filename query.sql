@@ -113,6 +113,27 @@ INSERT INTO videos (mission_id, video_title, video_description, video_url, video
 (1, 'Algebraic Expressions', 'Forming expressions with variables.', '/videos/sample_video_eng.mp4', 2, 'english', '720p');
 -- You'll need to insert similar data for Mission 2, Mission 3, etc.
 
+-- Mock Video Data for Mission 2: 'Solving One-Step Equations'
+INSERT INTO videos (mission_id, video_title, video_description, video_url, video_order, language, quality) VALUES
+(2, 'Solving with Addition & Subtraction', 'Learn how to isolate a variable using addition and subtraction.', '/videos/sample_video_eng.mp4', 1, 'english', '720p'),
+(2, 'Solving with Addition & Subtraction (Hindi)', 'Same concept, but in Hindi.', '/videos/sample_video_hin.mp4', 1, 'hindi', '720p'),
+(2, 'Solving with Addition & Subtraction (Telugu)', 'Same concept, but in Telugu.', '/videos/sample_video_tel.mp4', 1, 'telugu', '720p'),
+(2, 'Solving with Multiplication & Division', 'Learn how to isolate a variable using multiplication and division.', '/videos/sample_video_eng.mp4', 2, 'english', '720p'),
+(2, 'Solving with Multiplication & Division (Hindi)', 'Same concept, but in Hindi.', '/videos/sample_video_hin.mp4', 2, 'hindi', '720p'),
+(2, 'Solving with Multiplication & Division (Telugu)', 'Same concept, but in Telugu.', '/videos/sample_video_tel.mp4', 2, 'telugu', '720p');
+
+
+-- Mock Video Data for Mission 3: 'Expressions and Terms'
+INSERT INTO videos (mission_id, video_title, video_description, video_url, video_order, language, quality) VALUES
+(3, 'Identifying Terms in Expressions', 'Learn what constitutes a "term" in an algebraic expression.', '/videos/sample_video_eng.mp4', 1, 'english', '720p'),
+(3, 'Identifying Terms (Hindi)', 'Same concept, but in Hindi.', '/videos/sample_video_hin.mp4', 1, 'hindi', '720p'),
+(3, 'Identifying Terms (Telugu)', 'Same concept, but in Telugu.', '/videos/sample_video_tel.mp4', 1, 'telugu', '720p'),
+(3, 'Coefficients and Variables', 'Understand the difference between the number part (coefficient) and the letter part (variable).', '/videos/sample_video_eng.mp4', 2, 'english', '720p'),
+(3, 'Coefficients and Variables (Hindi)', 'Same concept, but in Hindi.', '/videos/sample_video_hin.mp4', 2, 'hindi', '720p'),
+(3, 'Coefficients and Variables (Telugu)', 'Same concept, but in Telugu.', '/videos/sample_video_tel.mp4', 2, 'telugu', '720p');
+
+
+
 -- ## SQL Script for New Missions
 -- SQL
 
