@@ -876,3 +876,69 @@ button[type="submit"]:hover {
         width: 100%; /* Full width on smaller screens */
     }
 }
+
+
+/* --- Leaderboard Page Styles --- */
+.leaderboard-container {
+    padding-top: 40px;
+    padding-bottom: 40px;
+    max-width: 900px;
+}
+
+.leaderboard-container .page-title {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.leaderboard-table-wrapper {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden; /* This makes the border-radius work with the table */
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+    padding: 15px 20px;
+    text-align: left;
+}
+
+.leaderboard-table thead {
+    background-color: #f8f9fa;
+}
+
+.leaderboard-table th {
+    font-weight: 600;
+    color: #34495e;
+    font-size: 0.9em;
+    text-transform: uppercase;
+}
+
+.leaderboard-table tbody tr {
+    border-bottom: 1px solid #e9ecef;
+}
+
+.leaderboard-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.leaderboard-table td:first-child {
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.leaderboard-table td:last-child {
+    font-weight: 700;
+    color: #3498db;
+}
+
+/* Style for the current user's ranking */
+.current-user-rank {
+    background-color: #e8f5e9; /* Light green highlight */
+    border-left: 4px solid #27ae60;
+    font-weight: bold;
+}

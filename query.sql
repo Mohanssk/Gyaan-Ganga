@@ -225,3 +225,12 @@ INSERT INTO videos (mission_id, video_title, video_description, video_url, video
 -- Videos for 'Prototyping and Testing' (mission_id = 11)
 INSERT INTO videos (mission_id, video_title, video_description, video_url, video_order, language, quality) VALUES
 (11, 'Building a Simple Prototype', 'From idea to a physical model.', '/videos/sample_video_eng.mp4', 1, 'english', '720p');
+
+
+ALTER TABLE users
+ADD COLUMN xp INT DEFAULT 0;
+
+-- Give some mock XP to your users. Replace the IDs (1, 2, etc.) with the actual IDs in your table.
+UPDATE users SET xp = 1250 WHERE id = 1;
+UPDATE users SET xp = 980 WHERE id = 2;
+UPDATE users SET xp = 1500 WHERE id = 3; -- Example of another user

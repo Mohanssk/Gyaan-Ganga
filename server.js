@@ -296,6 +296,30 @@ app.get('/mission/:id', async (req, res) => {
         res.status(500).send('Error loading mission.');
     }
 });
+
+// NEW: Leaderboard Route
+app.get('/leaderboard', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  try {
+    // Fetch top 20 users, ordered by XP in descending order
+    const result = await db.query(
+      "SELECT id, full_name, username, city, xp FROM users ORDER BY xp DESC LIMIT 20"
+    );
+    const topUsers = result.rows;
+
+    res.render('leaderboard', { 
+      user: req.session.user, 
+      topUsers: topUsers 
+    });
+  } catch (err) {
+    console.error("Error fetching leaderboard data:", err);
+    res.redirect('/');
+  }
+});
+
   // --- Start Server ---
 app.listen(port, () => {
     console.log(`🟢 Server running on http://localhost:${port}`);
