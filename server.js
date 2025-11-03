@@ -18,10 +18,18 @@ const port = process.env.PORT || 3000;
 const saltRounds = 10;
 
 // Database Client Setup
-const db = new pg.Client({
+const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
+
+// const db = new pg.Client({
+//   user: 'postgres',
+//   host: 'localhost',
+//   database: 'GyanGanga',
+//   password: '12345', // Replace with your actual password
+//   port: 5432,
+// });
 
 // First, connect to the database
 db.connect((err) => {
@@ -89,33 +97,40 @@ db.connect((err) => {
   }
 
   // --- Routes ---
-
 app.get('/', (req, res) => {
-    if (req.session.user) {
-      // If user is logged in, render the dashboard
-      res.render('home', { user: req.session.user });
+  if (req.session.user) {
+    // Check the user's role
+    if (req.session.user.role === 'teacher') {
+      res.render('teacher_dashboard', { user: req.session.user });
     } else {
-      // If no user is logged in, render the public landing page
-      res.render('index', { user: null });
+      res.render('home', { user: req.session.user }); // Student homepage
     }
-  });
-  
-  // NEW: Add a route for the dashboard link in the nav
+  } else {
+    // If no user is logged in, render the public landing page
+    res.render('index', { user: null });
+  }
+});
+
+// UPDATED: Dashboard route also forks based on user role
 app.get('/dashboard', (req, res) => {
   if (req.session.user) {
-    // Mock data for the user's course progress
-    const courseProgressData = {
-      maths: 75,
-      science: 50,
-      technology: 90,
-      engineering: 25,
-    };
-
-    // Pass both the user and their progress to the template
-    res.render('dashboard', { 
-      user: req.session.user,
-      progress: courseProgressData 
-    });
+    if (req.session.user.role === 'teacher') {
+      res.render('teacher_dashboard', { user: req.session.user });
+    } else {
+      // Student dashboard (the stats page)
+      
+      // We'll use mock data for now, as in the previous step
+      const courseProgressData = {
+        maths: 75,
+        science: 50,
+        technology: 90,
+        engineering: 25,
+      };
+      res.render('dashboard', { 
+        user: req.session.user,
+        progress: courseProgressData
+      });
+    }
   } else {
     res.redirect('/login');
   }
@@ -295,6 +310,95 @@ app.get('/mission/:id', async (req, res) => {
         console.error("Error fetching mission details:", err);
         res.status(500).send('Error loading mission.');
     }
+});
+
+app.get('/teacher/create-assessment', async (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'teacher') {
+    return res.redirect('/login');
+  }
+
+  try {
+    // We need to fetch the teacher's classrooms to let them choose
+    const classroomsResult = await db.query(
+      "SELECT * FROM classrooms WHERE teacher_id = $1", 
+      [req.session.user.id]
+    );
+    
+    // Pass flash messages to the template so the partial can read `messages` safely
+    res.render('create_assessment', { 
+      user: req.session.user, 
+      classrooms: classroomsResult.rows,
+      messages: req.flash()
+    });
+
+  } catch (err) {
+    console.error("Error loading assessment page:", err);
+    res.redirect('/dashboard');
+  }
+});
+
+// POST Route to save the new assessment and all its questions
+app.post('/teacher/create-assessment', async (req, res) => {
+  if (!req.session.user || req.session.user.role !== 'teacher') {
+    return res.redirect('/login');
+  }
+
+  const { title, description, classroom_id, assessment_type, due_date } = req.body;
+  const questions = req.body.questions || [];
+
+  try {
+    let assessmentTable = '';
+    
+    // 1. Determine which "container" table to use
+    if (assessment_type === 'quiz') assessmentTable = 'quizzes';
+    else if (assessment_type === 'test') assessmentTable = 'tests';
+    else if (assessment_type === 'q_assignment') assessmentTable = 'q_assignments';
+    else throw new Error("Invalid assessment type");
+
+    // 2. Create the main assessment (Quiz, Test, or Assignment)
+    let assessmentResult;
+    if (assessment_type === 'q_assignment') {
+      assessmentResult = await db.query(
+        `INSERT INTO ${assessmentTable} (title, description, classroom_id, due_date) VALUES ($1, $2, $3, $4) RETURNING id`,
+        [title, description, classroom_id, due_date || null]
+      );
+    } else {
+      assessmentResult = await db.query(
+        `INSERT INTO ${assessmentTable} (title, description, classroom_id) VALUES ($1, $2, $3) RETURNING id`,
+        [title, description, classroom_id]
+      );
+    }
+    
+    const newAssessmentId = assessmentResult.rows[0].id;
+
+    // 3. Loop through and save all the questions
+    for (const q of questions) {
+      // ** THIS IS THE BUG FIX **
+      // We now correctly find the answer text instead of just saving the index.
+      const optionsObject = q.options || {}; // This is {'0': 'A', '1': 'B', ...}
+      const correctIndex = q.correct; // This is '0', '1', ...
+      const correctAnswerText = optionsObject[correctIndex]; // This finds the actual text
+
+      if (!correctAnswerText) {
+        // This stops the server from crashing if no correct answer is selected
+        console.warn("Skipping question with no correct answer:", q.text);
+        continue; 
+      }
+      
+      await db.query(
+        "INSERT INTO questions (assessment_id, assessment_type, question_text, options, correct_answer) VALUES ($1, $2, $3, $4, $5)",
+        [newAssessmentId, assessment_type, q.text, JSON.stringify(optionsObject), correctAnswerText]
+      );
+    }
+    
+    req.flash('success', `${assessment_type} created successfully!`);
+    res.redirect('/dashboard');
+
+  } catch (err) {
+    console.error("Error creating assessment:", err);
+    req.flash('error', 'There was an error creating the assessment.');
+    res.redirect('/teacher/create-assessment');
+  }
 });
 
 // NEW: Leaderboard Route
