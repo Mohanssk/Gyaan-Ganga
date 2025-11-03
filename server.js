@@ -18,7 +18,7 @@ const port = process.env.PORT || 3000;
 const saltRounds = 10;
 
 // Database Client Setup
-const db = new pg.Client({
+const db = new pg.Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
